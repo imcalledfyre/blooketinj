@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JS Injector for Blooket</title>
+    <title>Blooket Dark Mode Injector</title>
     <style>
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
             width: 100%;
-            overflow: hidden;
             font-family: Arial, sans-serif;
         }
 
@@ -27,11 +26,28 @@
             align-items: center;
         }
 
-        #controls button {
+        #urlInput {
+            width: 60%;
+            padding: 8px;
+            font-size: 16px;
+        }
+
+        #injectButton {
             padding: 10px;
-            font-size: 14px;
-            margin-left: 10px;
+            font-size: 16px;
             cursor: pointer;
+        }
+
+        #customCode {
+            margin: 20px;
+            padding: 10px;
+            border: 2px dashed #007bff;
+            background-color: #f0f8ff;
+            font-family: monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            overflow: auto;
+            height: 200px; /* Height for the custom code area */
         }
 
         iframe {
@@ -48,24 +64,13 @@
 
     <!-- Control Panel -->
     <div id="controls">
-        <button id="injectButton">Inject JS</button>
-        <button id="reloadButton">Reload iFrame</button>
+        <input id="urlInput" type="text" value="https://www.blooket.com" />
+        <button id="injectButton">Inject Custom Code</button>
     </div>
 
-    <!-- iFrame that loads Blooket -->
-    <iframe name="myiframe" id="myiframe" src="https://www.blooket.com/"></iframe>
-
-    <script>
-        // ===================================================
-        //                  PLACE YOUR JS CODE HERE
-        // ===================================================
-        // 
-        // Example:
-        // alert('Hello, this is your injected JS!');
-        // console.log('This script was injected into the iframe.');
-
-        const predefinedJS = `
-         /**
+    <!-- Custom Code Area -->
+    <div id="customCode">
+     /**
 * @license StewartPrivateLicense-2.0.1
 * Copyright (c) Aerell McKnight 2023
 *
@@ -3785,25 +3790,33 @@
         }
     });
 })();
-        `;
-        // ===================================================
+    </div>
 
-        // Inject JavaScript into the iframe
+    <!-- iFrame that loads Blooket or any site -->
+    <iframe id="myiframe" src="https://www.blooket.com"></iframe>
+
+    <script>
+        // Function to inject the custom code into the iframe
         document.getElementById('injectButton').addEventListener('click', function() {
-            var iFrameHead = window.frames["myiframe"].document.getElementsByTagName("head")[0];
+            const iframeWindow = document.getElementById('myiframe').contentWindow;
+            const iframeDocument = document.getElementById('myiframe').contentDocument || iframeWindow.document;
+            
+            // Retrieve the custom code from the #customCode div
+            const customCode = document.getElementById('customCode').innerText;
 
-            // Create script tag with predefined JS
-            var myscript = document.createElement('script');
-            myscript.type = 'text/javascript';
-            myscript.text = predefinedJS; // Predefined JS code
+            // Create a script element for the custom code
+            const scriptElement = iframeDocument.createElement('script');
+            scriptElement.type = 'text/javascript';
+            scriptElement.text = customCode; // Set the custom code
 
-            // Inject the script into the iframe head
-            iFrameHead.appendChild(myscript);
+            // Inject the script into the iframe
+            iframeDocument.body.appendChild(scriptElement);
         });
 
-        // Reload the iframe
-        document.getElementById('reloadButton').addEventListener('click', function() {
-            document.getElementById('myiframe').src = document.getElementById('myiframe').src;
+        // Optional: Update the iframe URL if the user changes it
+        document.getElementById('urlInput').addEventListener('change', function() {
+            const url = document.getElementById('urlInput').value;
+            document.getElementById('myiframe').src = url;
         });
     </script>
 
